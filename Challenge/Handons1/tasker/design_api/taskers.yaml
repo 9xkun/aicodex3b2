@@ -1,0 +1,76 @@
+swagger: "2.0"
+info:
+  description: "API for managing tasks in Tasker application"
+  version: "1.0.0"
+  title: "Tasker API"
+host: "api.tasker.com"
+basePath: "/v1"
+schemes:
+  - "https"
+paths:
+  /tasks:
+    post:
+      summary: "Add a new task"
+      description: "Create a new task with the provided details"
+      operationId: "addTask"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "task"
+          description: "Task object that needs to be added"
+          required: true
+          schema:
+            type: "object"
+            required:
+              - "title"
+            properties:
+              title:
+                type: "string"
+                example: "Complete project report"
+              description:
+                type: "string"
+                example: "Finish the project report by end of the week"
+              priority:
+                type: "string"
+                enum: ["High", "Medium", "Low"]
+                example: "High"
+              due_date:
+                type: "string"
+                format: "date"
+                example: "2023-10-15"
+      responses:
+        201:
+          description: "Task created successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Task added successfully"
+              task_id:
+                type: "integer"
+                example: 123
+        400:
+          description: "Validation error"
+          schema:
+            type: "object"
+            properties:
+              error:
+                type: "string"
+                example: "Validation error"
+              details:
+                type: "object"
+                additionalProperties:
+                  type: "string"
+                example: { "title": "Title is required" }
+        500:
+          description: "Internal server error"
+          schema:
+            type: "object"
+            properties:
+              error:
+                type: "string"
+                example: "Internal server error"
