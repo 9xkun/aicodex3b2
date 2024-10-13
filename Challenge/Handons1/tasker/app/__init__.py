@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flasgger import Swagger
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -18,6 +19,7 @@ def create_app(config = None):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    Swagger(app)  # Initialize Swagger
 
     from app.controllers.user_controller import user_bp
     from app.controllers.task_controller import task_bp
