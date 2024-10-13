@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Management System</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Task Management System</h1>
+    <div id="task-list">
+        <h2>Task List</h2>
+        <ul>
+            {% for task in tasks %}
+            <li>
+                <h3>{{ task.name }}</h3>
+                <p>{{ task.description }}</p>
+                <p>Priority: {{ task.priority }}</p>
+                <p>Due Date: {{ task.duedate }}</p>
+                <p>User ID: {{ task.user_id }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
