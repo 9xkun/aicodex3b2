@@ -3,7 +3,9 @@ from flask import Blueprint, request, jsonify
 from app.services.user_service import UserService
 from app.utils.stringvalidator import StringValidator
 from flasgger import swag_from
-import re
+
+MAXIMUM_NAME_LENGTH = 50
+MINIMUM_NAME_LENGTH = 6
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -31,19 +33,29 @@ user_bp = Blueprint('user_bp', __name__)
                 'type': 'object',
                 'properties': {
                     'name': {
-                        'type': 'string'
+                        'type': 'string',
+                        'example': 'John Doe',
                     },
                     'password': {
-                        'type': 'string'
+                        'type': 'string',
+                        'minLength': 8,
+                        'maxLength': 50,
+                        'description': 'Password must be between 8 and 50 characters',
                     },
                     'email': {
-                        'type': 'string'
+                        'type': 'string',
+                        'description': 'Email must be less than 120 characters',
+                        'example': 'hoang@mail.com'
                     },
                     'phone': {
-                        'type': 'string'
+                        'type': 'string',
+                        'minLength': 10,
+                        'maxLength': 10,
+                        'description': 'Phone number must be 10 characters',
+                        'default': None
                     }
                 },
-                'required': ['name', 'password', 'email', 'phone']
+                'required': ['name', 'email']
             }
         }
     ]
@@ -52,8 +64,8 @@ def create_user():
     data = request.get_json()
 
     # vaildate name < 80 characters
-    if len(data['name']) > 80:
-        return jsonify({'message': 'Name must be less than 80 characters'}), 400
+    if len(data['name']) > MAXIMUM_NAME_LENGTH or len(data['name']) < MINIMUM_NAME_LENGTH:
+        return jsonify({'message': 'Name must be between 6 and 50 characters'}), 400
 
     # validate password > 8 characters < 50
     if len(data['password']) < 8 or len(data['password']) > 50:

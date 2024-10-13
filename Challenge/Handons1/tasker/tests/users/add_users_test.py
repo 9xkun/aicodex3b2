@@ -1,33 +1,12 @@
 import unittest
 import json
 
-from app import create_app, db
+from tests.basttest import BaseTestController
 
 # tests/test_user_controller.py
-class TestUserController(unittest.TestCase):
-    def setUp(self):
-        # python server
-        config = {
-            #'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-            'SQLALCHEMY_DATABASE_URI': 'sqlite:///../instance/task_tests.db',
-            'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-            'TESTING': True
-        }
-        self.app = create_app(config)
+class TestUserController(BaseTestController):
 
-        with self.app.app_context():
-            db.create_all()
-
-        # python browser
-        self.client = self.app.test_client()
-        self.app.testing = True
-
-
-    # teardown
-    def tearDown(self):
-        with self.app.app_context():
-            db.drop_all()
-
+    # test create user
     def test_create_user(self):
         user_data = {
             "name": "John Doe",
@@ -35,6 +14,7 @@ class TestUserController(unittest.TestCase):
             "email": "john.doe@example.com",
             "phone": "0912106111"
         }
+
         response = self.client.post('/api/users', data=json.dumps(user_data), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.data)
@@ -47,6 +27,7 @@ class TestUserController(unittest.TestCase):
             "email": "john.doe@invalid",
             "phone": "0912106111"
         }
+
         response = self.client.post('/api/users', data=json.dumps(user_data), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('Invalid email format', response.get_json()['message'])
@@ -62,7 +43,7 @@ class TestUserController(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('Invalid phone length', response.get_json()['message'])
 
-    def test_create_user_invalid_name_length(self):
+    def test_create_user_invalid_name_length_smaller(self):
         user_data = {
             "name": "J",
             "password": "password123",
@@ -71,7 +52,19 @@ class TestUserController(unittest.TestCase):
         }
         response = self.client.post('/api/users', data=json.dumps(user_data), content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Invalid name length', response.get_json()['message'])
+        self.assertIn('Name must be between 6 and 50 characters', response.get_json()['message'])
+
+    def test_create_user_invalid_name_length_bigger(self):
+        user_data = {
+            "name": "J" * 100,
+            "password": "password123",
+            "email": "john.doe@example.com",
+            "phone": "0912106111"
+        }
+
+        response = self.client.post('/api/users', data=json.dumps(user_data), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Name must be between 6 and 50 characters', response.get_json()['message'])
 
     def test_create_user_invalid_password_length(self):
         user_data = {
